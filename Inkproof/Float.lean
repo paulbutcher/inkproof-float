@@ -7,3 +7,4 @@ import Inkproof.Float.FloatModel
 import Inkproof.Float.FloatOrder
 import Inkproof.Float.Axioms
 import Inkproof.Float.OrdFloat
+import Inkproof.Float.RelError

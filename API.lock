@@ -64,6 +64,10 @@ def Inkproof.Float.negZeroBits : UInt64
 theorem Inkproof.Float.rat_abs_add_le : ∀ (x y : Rat), (x + y).abs ≤ x.abs + y.abs
 theorem Inkproof.Float.rat_abs_le_iff : ∀ {x y : Rat}, x.abs ≤ y ↔ -y ≤ x ∧ x ≤ y
 theorem Inkproof.Float.rat_abs_mul : ∀ (x y : Rat), (x * y).abs = x.abs * y.abs
+theorem Inkproof.Float.rel_error_div : ∀ (t4 t3 v A B C u c4 k c : Rat), k < 1 → C ≠ 0 → u * C = A * B → (t4 - A * B).abs ≤ (A * B).abs * c4 → (t3 - C).abs ≤ C.abs * k → v * t3 = t4 → c4 + k ≤ c * (1 - k) → (v - u).abs ≤ u.abs * c
+theorem Inkproof.Float.rel_error_mul : ∀ (x y a b c1 c2 : Rat), 0 ≤ c1 → (x - a).abs ≤ a.abs * c1 → (y - b).abs ≤ b.abs * c2 → (x * y - a * b).abs ≤ (a * b).abs * (c1 + c2 + c1 * c2)
+theorem Inkproof.Float.rel_error_round : ∀ (z x r c k : Rat), 0 ≤ k → (x - r).abs ≤ r.abs * c → (z - x).abs ≤ x.abs * k → (z - r).abs ≤ r.abs * (c + k + c * k)
+theorem Inkproof.Float.rel_error_step : ∀ (q p m d k : Rat), 0 ≤ k → k ≤ 1 → (p - m).abs ≤ m.abs * k → (q - (p + d)).abs ≤ (p + d).abs * k → (q - (m + d)).abs ≤ 4 * (m.abs + d.abs) * k
 def Inkproof.Float.scaleTwoPow : Nat → Int → Rat
 theorem Inkproof.Float.scaleTwoPow_of_neg : ∀ (m : Nat) {e : Int}, e < 0 → Inkproof.Float.scaleTwoPow m e = ↑m / ↑(2 ^ (-e).toNat)
 theorem Inkproof.Float.scaleTwoPow_of_nonneg : ∀ (m : Nat) {e : Int}, 0 ≤ e → Inkproof.Float.scaleTwoPow m e = ↑m * ↑(2 ^ e.toNat)
