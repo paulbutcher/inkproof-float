@@ -14,6 +14,11 @@ package «inkproof-float-test» where
 
 require «inkproof-float» from ".."
 
+-- Compile-time tests: compiling is passing.
+@[default_target]
+lean_lib InkproofFloatTest where
+  globs := #[.submodules `InkproofFloatTest]
+
 @[default_target]
 lean_exe tests where
   root := `Main

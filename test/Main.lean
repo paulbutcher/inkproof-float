@@ -5,8 +5,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import InkproofTools.Test.Harness
 import InkproofTools.Test.Platform
 import Inkproof.Float
+import InkproofFloatTest.FloatTests
 
-open InkproofTools.Test
+open InkproofTools.Test InkproofFloatTest
 
 def main (args : List String) : IO UInt32 :=
-  runTests [platformTest (args.contains "--expect-wasm")]
+  runTests (platformTest (args.contains "--expect-wasm") :: FloatTests.tests)
