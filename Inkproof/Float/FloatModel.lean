@@ -33,4 +33,22 @@ theorem Float.toRat_eq_value (x : Float) : Float.toRat x = unpackedValue x.toMod
     simp_all [UInt64.toNat_toBitVec] <;>
     (by_cases hh : x.toBits.toNat < 2 ^ 63 <;> simp [hh, scaleTwoPow_zero])
 
+open Internal.FloatModel in
+/-- `Float32.toRat` is the value of the unpacked float of Lean's model. -/
+theorem Float32.toRat_eq_value (x : Float32) : Float32.toRat x = unpackedValue x.toModel.unpack := by
+  have hE : ((x.toBits >>> 23) &&& 0xff).toNat = x.toBits.toNat / 2 ^ 23 % 2 ^ 8 := by
+    simp only [UInt32.toNat_and, UInt32.toNat_shiftRight, Nat.shiftRight_eq_div_pow]
+    exact Nat.and_two_pow_sub_one_eq_mod _ 8
+  have hM : (x.toBits &&& 0x7fffff).toNat = x.toBits.toNat % 2 ^ 23 := by
+    simp only [UInt32.toNat_and]
+    exact Nat.and_two_pow_sub_one_eq_mod _ 23
+  have hS : x.toBits >>> 31 = 0 ↔ x.toBits.toNat < 2 ^ 31 := by
+    rw [← UInt32.toNat_inj, UInt32.toNat_shiftRight, Nat.shiftRight_eq_div_pow]
+    simp
+  show _ = unpackedValue (UnpackedFloat.unpack Format.binary32 x.toBits.toBitVec)
+  refine unpack_cases32 x.toBits.toBitVec (fun u => Float32.toRat x = unpackedValue u) ?_ ?_ ?_ ?_ ?_ <;>
+    intros <;> simp only [Float32.toRat, unpackedValue, sgn32, hE, hM, hS] <;>
+    simp_all [UInt32.toNat_toBitVec] <;>
+    (by_cases hh : x.toBits.toNat < 2 ^ 31 <;> simp [hh, scaleTwoPow_zero])
+
 end Inkproof.Float

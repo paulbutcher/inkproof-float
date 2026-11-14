@@ -5,6 +5,7 @@ def Inkproof.Float.Float.IsFinite : Float → Prop
 def Inkproof.Float.Float.IsOrdered : Float → Prop
 theorem Inkproof.Float.Float.approximates_add : ∀ {x y : Float} {a b : Rat}, Inkproof.Float.Float.toRat x = Option.some a → Inkproof.Float.Float.toRat y = Option.some b → Inkproof.Float.NormalRange (a + b) → Inkproof.Float.Float.Approximates (x + y) (a + b)
 theorem Inkproof.Float.Float.approximates_div : ∀ {x y : Float} {a b : Rat}, Inkproof.Float.Float.toRat x = Option.some a → Inkproof.Float.Float.toRat y = Option.some b → b ≠ 0 → Inkproof.Float.NormalRange (a / b) → Inkproof.Float.Float.Approximates (x / y) (a / b)
+theorem Inkproof.Float.Float.approximates_fma : ∀ {x y z : Float} {a b c : Rat}, Inkproof.Float.Float.toRat x = Option.some a → Inkproof.Float.Float.toRat y = Option.some b → Inkproof.Float.Float.toRat z = Option.some c → Inkproof.Float.NormalRange (a * b + c) → Inkproof.Float.Float.Approximates (x.fma y z) (a * b + c)
 theorem Inkproof.Float.Float.approximates_mul : ∀ {x y : Float} {a b : Rat}, Inkproof.Float.Float.toRat x = Option.some a → Inkproof.Float.Float.toRat y = Option.some b → Inkproof.Float.NormalRange (a * b) → Inkproof.Float.Float.Approximates (x * y) (a * b)
 theorem Inkproof.Float.Float.approximates_sub : ∀ {x y : Float} {a b : Rat}, Inkproof.Float.Float.toRat x = Option.some a → Inkproof.Float.Float.toRat y = Option.some b → Inkproof.Float.NormalRange (a - b) → Inkproof.Float.Float.Approximates (x - y) (a - b)
 theorem Inkproof.Float.Float.le_of_toRat_le : ∀ {x y : Float} {a b : Rat}, Inkproof.Float.Float.toRat x = Option.some a → Inkproof.Float.Float.toRat y = Option.some b → a ≤ b → x ≤ y
@@ -12,6 +13,33 @@ def Inkproof.Float.Float.toRat : Float → Option Rat
 theorem Inkproof.Float.Float.toRat_eq_value : ∀ (x : Float), Inkproof.Float.Float.toRat x = Inkproof.Float.unpackedValue x.toModel.unpack
 theorem Inkproof.Float.Float.toRat_mono : ∀ {x y : Float} {a b : Rat}, Inkproof.Float.Float.toRat x = Option.some a → Inkproof.Float.Float.toRat y = Option.some b → x ≤ y → a ≤ b
 theorem Inkproof.Float.Float.toRat_ofNat : ∀ {n : Nat}, n < 2 ^ 53 → Inkproof.Float.Float.toRat (OfNat.ofNat n) = Option.some ↑n
+def Inkproof.Float.Float32.Approximates : Float32 → Rat → Prop
+theorem Inkproof.Float.Float32.Approximates.error_step : ∀ {z : Float32} {r s e : Rat}, Inkproof.Float.Float32.Approximates z r → (r - s).abs ≤ e → ∃ q, Inkproof.Float.Float32.toRat z = Option.some q ∧ (q - s).abs ≤ e + (s.abs + e) / Inkproof.Float.scaleTwoPow 1 24
+theorem Inkproof.Float.Float32.Approximates.rel : ∀ {z : Float32} {r : Rat}, Inkproof.Float.Float32.Approximates z r → ∃ q δ, Inkproof.Float.Float32.toRat z = Option.some q ∧ δ.abs ≤ 1 / Inkproof.Float.scaleTwoPow 1 24 ∧ q = r * (1 + δ)
+def Inkproof.Float.Float32.IsFinite : Float32 → Prop
+theorem Inkproof.Float.Float32.approximates_add : ∀ {x y : Float32} {a b : Rat}, Inkproof.Float.Float32.toRat x = Option.some a → Inkproof.Float.Float32.toRat y = Option.some b → Inkproof.Float.FloatFormat.binary32.NormalRange (a + b) → Inkproof.Float.Float32.Approximates (x + y) (a + b)
+theorem Inkproof.Float.Float32.approximates_div : ∀ {x y : Float32} {a b : Rat}, Inkproof.Float.Float32.toRat x = Option.some a → Inkproof.Float.Float32.toRat y = Option.some b → b ≠ 0 → Inkproof.Float.FloatFormat.binary32.NormalRange (a / b) → Inkproof.Float.Float32.Approximates (x / y) (a / b)
+theorem Inkproof.Float.Float32.approximates_fma : ∀ {x y z : Float32} {a b c : Rat}, Inkproof.Float.Float32.toRat x = Option.some a → Inkproof.Float.Float32.toRat y = Option.some b → Inkproof.Float.Float32.toRat z = Option.some c → Inkproof.Float.FloatFormat.binary32.NormalRange (a * b + c) → Inkproof.Float.Float32.Approximates (x.fma y z) (a * b + c)
+theorem Inkproof.Float.Float32.approximates_mul : ∀ {x y : Float32} {a b : Rat}, Inkproof.Float.Float32.toRat x = Option.some a → Inkproof.Float.Float32.toRat y = Option.some b → Inkproof.Float.FloatFormat.binary32.NormalRange (a * b) → Inkproof.Float.Float32.Approximates (x * y) (a * b)
+theorem Inkproof.Float.Float32.approximates_sub : ∀ {x y : Float32} {a b : Rat}, Inkproof.Float.Float32.toRat x = Option.some a → Inkproof.Float.Float32.toRat y = Option.some b → Inkproof.Float.FloatFormat.binary32.NormalRange (a - b) → Inkproof.Float.Float32.Approximates (x - y) (a - b)
+theorem Inkproof.Float.Float32.le_of_toRat_le : ∀ {x y : Float32} {a b : Rat}, Inkproof.Float.Float32.toRat x = Option.some a → Inkproof.Float.Float32.toRat y = Option.some b → a ≤ b → x ≤ y
+def Inkproof.Float.Float32.toRat : Float32 → Option Rat
+theorem Inkproof.Float.Float32.toRat_eq_value : ∀ (x : Float32), Inkproof.Float.Float32.toRat x = Inkproof.Float.unpackedValue x.toModel.unpack
+theorem Inkproof.Float.Float32.toRat_mono : ∀ {x y : Float32} {a b : Rat}, Inkproof.Float.Float32.toRat x = Option.some a → Inkproof.Float.Float32.toRat y = Option.some b → x ≤ y → a ≤ b
+theorem Inkproof.Float.Float32.toRat_ofNat : ∀ {n : Nat}, n < 2 ^ 24 → Inkproof.Float.Float32.toRat (OfNat.ofNat n) = Option.some ↑n
+structure Inkproof.Float.FloatFormat : Type
+def Inkproof.Float.FloatFormat.Approx : Inkproof.Float.FloatFormat → Option Rat → Rat → Prop
+theorem Inkproof.Float.FloatFormat.Approx.error_step : ∀ {f : Inkproof.Float.FloatFormat} {z : Option Rat} {r s e : Rat}, f.Approx z r → (r - s).abs ≤ e → ∃ q, z = Option.some q ∧ (q - s).abs ≤ e + (s.abs + e) / Inkproof.Float.scaleTwoPow 1 ↑f.prec
+theorem Inkproof.Float.FloatFormat.Approx.rel : ∀ {f : Inkproof.Float.FloatFormat} {z : Option Rat} {r : Rat}, f.Approx z r → ∃ q δ, z = Option.some q ∧ δ.abs ≤ 1 / Inkproof.Float.scaleTwoPow 1 ↑f.prec ∧ q = r * (1 + δ)
+theorem Inkproof.Float.FloatFormat.Approx.ulps : ∀ {f : Inkproof.Float.FloatFormat} {z : Option Rat} {r k : Rat}, f.Approx z r → 1 / 2 ≤ k → ∃ q, z = Option.some q ∧ (q - r).abs ≤ 2 * k * r.abs / Inkproof.Float.scaleTwoPow 1 ↑f.prec
+def Inkproof.Float.FloatFormat.NormalRange : Inkproof.Float.FloatFormat → Rat → Prop
+def Inkproof.Float.FloatFormat.binary32 : Inkproof.Float.FloatFormat
+def Inkproof.Float.FloatFormat.binary64 : Inkproof.Float.FloatFormat
+field Inkproof.Float.FloatFormat.maxExp : Inkproof.Float.FloatFormat → Nat
+def Inkproof.Float.FloatFormat.maxFloat : Inkproof.Float.FloatFormat → Rat
+def Inkproof.Float.FloatFormat.minNormalFloat : Inkproof.Float.FloatFormat → Rat
+constructor Inkproof.Float.FloatFormat.mk : Nat → Nat → Inkproof.Float.FloatFormat
+field Inkproof.Float.FloatFormat.prec : Inkproof.Float.FloatFormat → Nat
 def Inkproof.Float.NormalRange : Rat → Prop
 structure Inkproof.Float.OrdFloat : Type
 theorem Inkproof.Float.OrdFloat.ext : ∀ {a b : Inkproof.Float.OrdFloat}, a.val = b.val → a = b
@@ -25,9 +53,11 @@ def Inkproof.Float.OrdFloat.ofFloat? : Float → Option Inkproof.Float.OrdFloat
 theorem Inkproof.Float.OrdFloat.ofFloat?_eq_none_iff : ∀ (x : Float), Inkproof.Float.OrdFloat.ofFloat? x = Option.none ↔ x.isNaN = Bool.true
 theorem Inkproof.Float.OrdFloat.ordered : ∀ (self : Inkproof.Float.OrdFloat), Inkproof.Float.Float.IsOrdered self.val
 field Inkproof.Float.OrdFloat.val : Inkproof.Float.OrdFloat → Float
+axiom Inkproof.Float.float32_rounding_model : (∀ (x y : Float32), Inkproof.Float.Float32.IsFinite x → Inkproof.Float.Float32.IsFinite y → (x ≤ y ↔ ∃ a b, Inkproof.Float.Float32.toRat x = Option.some a ∧ Inkproof.Float.Float32.toRat y = Option.some b ∧ a ≤ b)) ∧ (∀ (n : Nat), n < 2 ^ 24 → Inkproof.Float.Float32.toRat (OfNat.ofNat n) = Option.some ↑n) ∧ (∀ (x y : Float32) (a b : Rat), Inkproof.Float.Float32.toRat x = Option.some a → Inkproof.Float.Float32.toRat y = Option.some b → (Inkproof.Float.FloatFormat.binary32.NormalRange (a + b) → Inkproof.Float.Float32.Approximates (x + y) (a + b)) ∧ (Inkproof.Float.FloatFormat.binary32.NormalRange (a - b) → Inkproof.Float.Float32.Approximates (x - y) (a - b)) ∧ (Inkproof.Float.FloatFormat.binary32.NormalRange (a * b) → Inkproof.Float.Float32.Approximates (x * y) (a * b)) ∧ (b ≠ 0 → Inkproof.Float.FloatFormat.binary32.NormalRange (a / b) → Inkproof.Float.Float32.Approximates (x / y) (a / b))) ∧ ∀ (x y z : Float32) (a b c : Rat), Inkproof.Float.Float32.toRat x = Option.some a → Inkproof.Float.Float32.toRat y = Option.some b → Inkproof.Float.Float32.toRat z = Option.some c → Inkproof.Float.FloatFormat.binary32.NormalRange (a * b + c) → Inkproof.Float.Float32.Approximates (x.fma y z) (a * b + c)
 theorem Inkproof.Float.float_le_linear : (∀ (x : Float), Inkproof.Float.Float.IsOrdered x → x ≤ x) ∧ (∀ (x y z : Float), Inkproof.Float.Float.IsOrdered x → Inkproof.Float.Float.IsOrdered y → Inkproof.Float.Float.IsOrdered z → x ≤ y → y ≤ z → x ≤ z) ∧ (∀ (x y : Float), Inkproof.Float.Float.IsOrdered x → Inkproof.Float.Float.IsOrdered y → x ≤ y → y ≤ x → x = y) ∧ ∀ (x y : Float), Inkproof.Float.Float.IsOrdered x → Inkproof.Float.Float.IsOrdered y → x ≤ y ∨ y ≤ x
-axiom Inkproof.Float.float_rounding_model : (∀ (x y : Float), Inkproof.Float.Float.IsFinite x → Inkproof.Float.Float.IsFinite y → (x ≤ y ↔ ∃ a b, Inkproof.Float.Float.toRat x = Option.some a ∧ Inkproof.Float.Float.toRat y = Option.some b ∧ a ≤ b)) ∧ (∀ (n : Nat), n < 2 ^ 53 → Inkproof.Float.Float.toRat (OfNat.ofNat n) = Option.some ↑n) ∧ ∀ (x y : Float) (a b : Rat), Inkproof.Float.Float.toRat x = Option.some a → Inkproof.Float.Float.toRat y = Option.some b → (Inkproof.Float.NormalRange (a + b) → Inkproof.Float.Float.Approximates (x + y) (a + b)) ∧ (Inkproof.Float.NormalRange (a - b) → Inkproof.Float.Float.Approximates (x - y) (a - b)) ∧ (Inkproof.Float.NormalRange (a * b) → Inkproof.Float.Float.Approximates (x * y) (a * b)) ∧ (b ≠ 0 → Inkproof.Float.NormalRange (a / b) → Inkproof.Float.Float.Approximates (x / y) (a / b))
-instance Inkproof.Float.instDecidableNormalRange : (r : Rat) → Decidable (Inkproof.Float.NormalRange r)
+axiom Inkproof.Float.float_rounding_model : (∀ (x y : Float), Inkproof.Float.Float.IsFinite x → Inkproof.Float.Float.IsFinite y → (x ≤ y ↔ ∃ a b, Inkproof.Float.Float.toRat x = Option.some a ∧ Inkproof.Float.Float.toRat y = Option.some b ∧ a ≤ b)) ∧ (∀ (n : Nat), n < 2 ^ 53 → Inkproof.Float.Float.toRat (OfNat.ofNat n) = Option.some ↑n) ∧ (∀ (x y : Float) (a b : Rat), Inkproof.Float.Float.toRat x = Option.some a → Inkproof.Float.Float.toRat y = Option.some b → (Inkproof.Float.NormalRange (a + b) → Inkproof.Float.Float.Approximates (x + y) (a + b)) ∧ (Inkproof.Float.NormalRange (a - b) → Inkproof.Float.Float.Approximates (x - y) (a - b)) ∧ (Inkproof.Float.NormalRange (a * b) → Inkproof.Float.Float.Approximates (x * y) (a * b)) ∧ (b ≠ 0 → Inkproof.Float.NormalRange (a / b) → Inkproof.Float.Float.Approximates (x / y) (a / b))) ∧ ∀ (x y z : Float) (a b c : Rat), Inkproof.Float.Float.toRat x = Option.some a → Inkproof.Float.Float.toRat y = Option.some b → Inkproof.Float.Float.toRat z = Option.some c → Inkproof.Float.NormalRange (a * b + c) → Inkproof.Float.Float.Approximates (x.fma y z) (a * b + c)
+instance Inkproof.Float.instDecidableNormalRange : (f : Inkproof.Float.FloatFormat) → (r : Rat) → Decidable (f.NormalRange r)
+instance Inkproof.Float.instDecidableNormalRange_1 : (r : Rat) → Decidable (Inkproof.Float.NormalRange r)
 def Inkproof.Float.maxFloat : Rat
 def Inkproof.Float.minNormalFloat : Rat
 def Inkproof.Float.negZeroBits : UInt64
@@ -37,5 +67,6 @@ theorem Inkproof.Float.rat_abs_mul : ∀ (x y : Rat), (x * y).abs = x.abs * y.ab
 def Inkproof.Float.scaleTwoPow : Nat → Int → Rat
 theorem Inkproof.Float.scaleTwoPow_of_neg : ∀ (m : Nat) {e : Int}, e < 0 → Inkproof.Float.scaleTwoPow m e = ↑m / ↑(2 ^ (-e).toNat)
 theorem Inkproof.Float.scaleTwoPow_of_nonneg : ∀ (m : Nat) {e : Int}, 0 ≤ e → Inkproof.Float.scaleTwoPow m e = ↑m * ↑(2 ^ e.toNat)
+theorem Inkproof.Float.scaleTwoPow_one_pos : ∀ (n : Nat), 0 < Inkproof.Float.scaleTwoPow 1 ↑n
 theorem Inkproof.Float.scaleTwoPow_zero : ∀ (e : Int), Inkproof.Float.scaleTwoPow 0 e = 0
 def Inkproof.Float.unpackedValue : Float.Model.UnpackedFloat → Option Rat

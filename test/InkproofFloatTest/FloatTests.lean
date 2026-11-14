@@ -90,6 +90,23 @@ def toRatValues : TestCase := .mk "toRat reads exact values" do
   check (Float.toRat (Float.ofBits 0x7fefffffffffffff) == some maxFloat) "largest finite"
   check (Float.toRat (0.0 / 0.0) == none && Float.toRat (1.0 / 0.0) == none) "NaN and infinity"
 
+def genTriple (g : Rng) : (Float × Float × Float) × Rng :=
+  let (x, g) := genNearOne g
+  let (y, g) := genNearOne g
+  let (z, g) := genNearOne g
+  ((x, y, z), g)
+
+def fmaModel : (Float × Float × Float) → Except String Unit := fun (x, y, z) =>
+  match Float.toRat x, Float.toRat y, Float.toRat z with
+  | some a, some b, some c =>
+    let r := a * b + c
+    if decide (NormalRange r) then
+      match Float.toRat (Float.fma x y z) with
+      | none => check false s!"fma of {x}, {y} and {z} is not finite"
+      | some q => check ((q - r).abs ≤ r.abs / scaleTwoPow 1 53) s!"fma of {x}, {y} and {z} is off"
+    else pure ()
+  | _, _, _ => pure ()
+
 def roundingModel : (Float × Float) → Except String Unit := fun (x, y) =>
   match Float.toRat x, Float.toRat y with
   | some a, some b => do
@@ -110,11 +127,54 @@ def roundingModelHolds : TestCase := .mk "the rounding model holds of the compil
   forAll 5000 finitePair roundingModel
   forAll 5000 nearPair roundingModel
 
+def fmaRounds : TestCase := .mk "fma rounds once, within half an ulp" <|
+  forAll 5000 genTriple fmaModel
+
+/-- Arbitrary bit patterns half the time, otherwise exponents near 1, as for binary64. -/
+def genFloat32 (g : Rng) : Float32 × Rng :=
+  let (kind, g) := g.below 2
+  let (bits, g) := g.below (2 ^ 32)
+  if kind = 0 then (Float32.ofBits (UInt32.ofNat bits), g)
+  else
+    let (e, g) := g.below 20
+    (Float32.ofBits (UInt32.ofNat (bits % 2 ^ 23 + (118 + e) * 2 ^ 23 + bits / 2 ^ 31 * 2 ^ 31)), g)
+
+def genFloat32Triple (g : Rng) : (Float32 × Float32 × Float32) × Rng :=
+  let (x, g) := genFloat32 g
+  let (y, g) := genFloat32 g
+  let (z, g) := genFloat32 g
+  ((x, y, z), g)
+
+def roundingModel32 : (Float32 × Float32 × Float32) → Except String Unit := fun (x, y, w) =>
+  match Float32.toRat x, Float32.toRat y, Float32.toRat w with
+  | some a, some b, some c => do
+    let within (name : String) (z : Float32) (r : Rat) : Except String Unit :=
+      if decide (FloatFormat.binary32.NormalRange r) then
+        match Float32.toRat z with
+        | none => check false s!"{name} of {x} and {y} is not finite"
+        | some q => check ((q - r).abs ≤ r.abs / scaleTwoPow 1 24) s!"{name} of {x} and {y} is off"
+      else pure ()
+    within "sum" (x + y) (a + b)
+    within "difference" (x - y) (a - b)
+    within "product" (x * y) (a * b)
+    if b != 0 then within "quotient" (x / y) (a / b)
+    within "fma" (Float32.fma x y w) (a * b + c)
+    check (decide (x ≤ y) == decide (a ≤ b)) s!"order of {x} and {y} disagrees with their values"
+  | _, _, _ => pure ()
+
+def roundingModel32Holds : TestCase := .mk "the binary32 rounding model holds of the compiled floats" <|
+  forAll 5000 genFloat32Triple roundingModel32
+
+def literals32Exact : TestCase := .mk "binary32 integer literals are exact" <|
+  forAll 2000 (fun g => g.below (2 ^ 24)) fun n =>
+    check (Float32.toRat (Float32.ofNat n) == some (n : Rat)) s!"{n}"
+
 def literalsExact : TestCase := .mk "integer literals are exact" <|
   forAll 2000 (fun g => g.below (2 ^ 53)) fun n =>
     check (Float.toRat (Float.ofNat n) == some (n : Rat)) s!"{n}"
 
 def tests : List TestCase :=
-  [ofFloatRejectsOnlyNaN, orderHolds, toRatValues, roundingModelHolds, literalsExact]
+  [ofFloatRejectsOnlyNaN, orderHolds, toRatValues, roundingModelHolds, fmaRounds, literalsExact,
+    roundingModel32Holds, literals32Exact]
 
 end InkproofFloatTest.FloatTests

@@ -76,6 +76,66 @@ theorem unpack_cases (b : BitVec 64) (P : UnpackedFloat → Prop)
       · exact finite_exp (by omega) (hsub ‹_› (Nat.pos_of_ne_zero ‹_›))
     · exact finite_exp (by omega) (hnorm ‹_› ‹_› (by omega))
 
+/-- The sign of the binary32 float whose bits are `n`. -/
+def sgn32 (n : Nat) : Sign := if n < 2 ^ 31 then .positive else .negative
+
+theorem unpack_cases32 (b : BitVec 32) (P : UnpackedFloat → Prop)
+    (hnan : b.toNat / 2 ^ 23 % 2 ^ 8 = 255 → b.toNat % 2 ^ 23 ≠ 0 → P .notANumber)
+    (hinf : b.toNat / 2 ^ 23 % 2 ^ 8 = 255 → b.toNat % 2 ^ 23 = 0 → P (.infinity (sgn32 b.toNat)))
+    (hzero : b.toNat / 2 ^ 23 % 2 ^ 8 = 0 → b.toNat % 2 ^ 23 = 0 → P (.zero (sgn32 b.toNat)))
+    (hsub : b.toNat / 2 ^ 23 % 2 ^ 8 = 0 → ∀ h : 0 < b.toNat % 2 ^ 23,
+      P (.finite (sgn32 b.toNat) (b.toNat % 2 ^ 23) (-149) h))
+    (hnorm : b.toNat / 2 ^ 23 % 2 ^ 8 ≠ 255 → b.toNat / 2 ^ 23 % 2 ^ 8 ≠ 0 →
+      ∀ h : 0 < 2 ^ 23 + b.toNat % 2 ^ 23,
+      P (.finite (sgn32 b.toNat) (2 ^ 23 + b.toNat % 2 ^ 23)
+        ((b.toNat / 2 ^ 23 % 2 ^ 8 : Nat) - 150) h)) :
+    P (UnpackedFloat.unpack Format.binary32 b) := by
+  unfold UnpackedFloat.unpack
+  simp only [UnpackedFloat.unpackMantissa, UnpackedFloat.unpackExponent, UnpackedFloat.unpackSign]
+  have hb := b.isLt
+  have hE : (BitVec.extractLsb' 23 8 b).toNat = b.toNat / 2 ^ 23 % 2 ^ 8 := by
+    simp [BitVec.extractLsb'_toNat, Nat.shiftRight_eq_div_pow]
+  have hM : (BitVec.extractLsb' 0 23 b).toNat = b.toNat % 2 ^ 23 := by
+    simp [BitVec.extractLsb'_toNat]
+  have hS : (BitVec.extractLsb' (23 + 8) 1 b).toNat = b.toNat / 2 ^ 31 := by
+    simp [BitVec.extractLsb'_toNat, Nat.shiftRight_eq_div_pow]
+    omega
+  have hA : (1#1 ++ BitVec.extractLsb' 0 23 b).toNat = 2 ^ 23 + b.toNat % 2 ^ 23 := by
+    rw [BitVec.toNat_append, hM]
+    simp
+    have := Nat.two_pow_add_eq_or_of_lt (i := 23) (Nat.mod_lt b.toNat (by decide)) 1
+    simp only [Nat.mul_one] at this
+    exact this.symm
+  have hE1 : BitVec.extractLsb' 23 8 b = -1#8 ↔ b.toNat / 2 ^ 23 % 2 ^ 8 = 255 := by
+    constructor
+    · intro h; have := congrArg BitVec.toNat h; rw [hE] at this; simpa using this
+    · intro h; apply BitVec.eq_of_toNat_eq; rw [hE, h]; simp
+  have hE0 : BitVec.extractLsb' 23 8 b = 0#8 ↔ b.toNat / 2 ^ 23 % 2 ^ 8 = 0 := by
+    constructor
+    · intro h; have := congrArg BitVec.toNat h; rw [hE] at this; simpa using this
+    · intro h; apply BitVec.eq_of_toNat_eq; rw [hE, h]; simp
+  have hM0 : BitVec.extractLsb' 0 23 b = 0#23 ↔ b.toNat % 2 ^ 23 = 0 := by
+    constructor
+    · intro h; have := congrArg BitVec.toNat h; rw [hM] at this; simpa using this
+    · intro h; apply BitVec.eq_of_toNat_eq; rw [hM, h]; simp
+  have hS0 : BitVec.extractLsb' (23 + 8) 1 b = 0#1 ↔ b.toNat < 2 ^ 31 := by
+    constructor
+    · intro h; have := congrArg BitVec.toNat h; rw [hS] at this; simp at this; omega
+    · intro h; apply BitVec.eq_of_toNat_eq; rw [hS]; simp; omega
+  simp only [Sign.ofBitVec, hE1, hE0, hM0, hS0, hE, hM, hA, Format.exponentBias]
+  have hsgn32 : (if b.toNat < 2 ^ 31 then Sign.positive else Sign.negative) = sgn32 b.toNat := rfl
+  rw [hsgn32]
+  split
+  · split
+    · exact hinf ‹_› ‹_›
+    · exact hnan ‹_› ‹_›
+  · split
+    · split
+      · exact hzero ‹_› ‹_›
+      · exact finite_exp (by omega) (hsub ‹_› (Nat.pos_of_ne_zero ‹_›))
+    · exact finite_exp (by omega) (hnorm ‹_› ‹_› (by omega))
+
+
 def ukey : UnpackedFloat → Option Int
   | .notANumber => none
   | .infinity s => some (s.apply (2047 * 2 ^ 52))
