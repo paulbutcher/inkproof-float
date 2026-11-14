@@ -21,4 +21,4 @@ Assessed against Lean v4.35.0 core, which has no theory of its rounding: `Float.
 ## Testing
 
 - Tests live in the `test` subproject (CLAUDE.md's Test layout). `lake test` runs `Main.lean` natively, then with Lasm; the library depends on nothing, and the theorems here import no Mathlib.
-- `InkproofFloatTest.AxiomCheck` fails compilation if a declaration depends on an axiom other than Lean's own and those in `Inkproof.Float.Axioms`; the shared check from inkproof-tools replaces it when it is provided.
+- `InkproofFloatTest.AxiomCheck`, from inkproof-tools, fails compilation if a declaration depends on an axiom other than Lean's own and those in `Inkproof.Float.Axioms`.
