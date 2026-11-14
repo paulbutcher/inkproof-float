@@ -5,6 +5,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 import Inkproof.Float.FloatValue
 import Inkproof.Float.FloatModel
 import Inkproof.Float.FloatOrder
+import Inkproof.Float.Exact
 import Inkproof.Float.Axioms
 import Inkproof.Float.OrdFloat
 import Inkproof.Float.RelError
