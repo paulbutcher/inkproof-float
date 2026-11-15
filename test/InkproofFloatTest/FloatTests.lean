@@ -177,4 +177,21 @@ def tests : List TestCase :=
   [ofFloatRejectsOnlyNaN, orderHolds, toRatValues, roundingModelHolds, fmaRounds, literalsExact,
     roundingModel32Holds, literals32Exact]
 
+/-! The rounding-constant lemmas instantiate at both formats; the scale of binary64 and binary32 is
+read off the format, so Scale's `16 * 2 ^ -53 = 2 ^ -49` and a binary32 analogue follow. -/
+
+example : 16 * (scaleTwoPow 1 FloatFormat.binary64.prec)⁻¹ = (scaleTwoPow 1 49)⁻¹ := by
+  have := FloatFormat.binary64.pow_mul_rounding_unit (k := 4) (by decide)
+  exact_mod_cast this
+
+example : 8 * (scaleTwoPow 1 FloatFormat.binary32.prec)⁻¹ = (scaleTwoPow 1 21)⁻¹ := by
+  have := FloatFormat.binary32.pow_mul_rounding_unit (k := 3) (by decide)
+  exact_mod_cast this
+
+example : (scaleTwoPow 1 FloatFormat.binary32.prec)⁻¹ ≤ 1 / 8 :=
+  FloatFormat.binary32.rounding_unit_le_eighth (by decide)
+
+example : (scaleTwoPow 1 FloatFormat.binary64.prec)⁻¹ ≤ 1 / 8 :=
+  FloatFormat.binary64.rounding_unit_le_eighth (by decide)
+
 end InkproofFloatTest.FloatTests

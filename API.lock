@@ -29,6 +29,7 @@ theorem Inkproof.Float.Float32.toRat_mono : ∀ {x y : Float32} {a b : Rat}, Ink
 theorem Inkproof.Float.Float32.toRat_ofNat : ∀ {n : Nat}, n < 2 ^ 24 → Inkproof.Float.Float32.toRat (OfNat.ofNat n) = Option.some ↑n
 structure Inkproof.Float.FloatFormat : Type
 def Inkproof.Float.FloatFormat.Approx : Inkproof.Float.FloatFormat → Option Rat → Rat → Prop
+theorem Inkproof.Float.FloatFormat.Approx.abs_le : ∀ {f : Inkproof.Float.FloatFormat} {z : Option Rat} {r : Rat}, f.Approx z r → ∃ q, z = Option.some q ∧ (q - r).abs ≤ r.abs * (Inkproof.Float.scaleTwoPow 1 ↑f.prec)⁻¹
 theorem Inkproof.Float.FloatFormat.Approx.error_step : ∀ {f : Inkproof.Float.FloatFormat} {z : Option Rat} {r s e : Rat}, f.Approx z r → (r - s).abs ≤ e → ∃ q, z = Option.some q ∧ (q - s).abs ≤ e + (s.abs + e) / Inkproof.Float.scaleTwoPow 1 ↑f.prec
 theorem Inkproof.Float.FloatFormat.Approx.rel : ∀ {f : Inkproof.Float.FloatFormat} {z : Option Rat} {r : Rat}, f.Approx z r → ∃ q δ, z = Option.some q ∧ δ.abs ≤ 1 / Inkproof.Float.scaleTwoPow 1 ↑f.prec ∧ q = r * (1 + δ)
 theorem Inkproof.Float.FloatFormat.Approx.ulps : ∀ {f : Inkproof.Float.FloatFormat} {z : Option Rat} {r k : Rat}, f.Approx z r → 1 / 2 ≤ k → ∃ q, z = Option.some q ∧ (q - r).abs ≤ 2 * k * r.abs / Inkproof.Float.scaleTwoPow 1 ↑f.prec
@@ -39,7 +40,10 @@ field Inkproof.Float.FloatFormat.maxExp : Inkproof.Float.FloatFormat → Nat
 def Inkproof.Float.FloatFormat.maxFloat : Inkproof.Float.FloatFormat → Rat
 def Inkproof.Float.FloatFormat.minNormalFloat : Inkproof.Float.FloatFormat → Rat
 constructor Inkproof.Float.FloatFormat.mk : Nat → Nat → Inkproof.Float.FloatFormat
+theorem Inkproof.Float.FloatFormat.pow_mul_rounding_unit : ∀ (f : Inkproof.Float.FloatFormat) {k : Nat}, k ≤ f.prec → ↑(2 ^ k) * (Inkproof.Float.scaleTwoPow 1 ↑f.prec)⁻¹ = (Inkproof.Float.scaleTwoPow 1 ↑(f.prec - k))⁻¹
 field Inkproof.Float.FloatFormat.prec : Inkproof.Float.FloatFormat → Nat
+theorem Inkproof.Float.FloatFormat.rounding_unit_le_eighth : ∀ (f : Inkproof.Float.FloatFormat), 3 ≤ f.prec → (Inkproof.Float.scaleTwoPow 1 ↑f.prec)⁻¹ ≤ 1 / 8
+theorem Inkproof.Float.FloatFormat.rounding_unit_pos : ∀ (f : Inkproof.Float.FloatFormat), 0 < (Inkproof.Float.scaleTwoPow 1 ↑f.prec)⁻¹
 def Inkproof.Float.NormalRange : Rat → Prop
 structure Inkproof.Float.OrdFloat : Type
 theorem Inkproof.Float.OrdFloat.ext : ∀ {a b : Inkproof.Float.OrdFloat}, a.val = b.val → a = b
@@ -71,6 +75,7 @@ theorem Inkproof.Float.rel_error_step : ∀ (q p m d k : Rat), 0 ≤ k → k ≤
 def Inkproof.Float.scaleTwoPow : Nat → Int → Rat
 theorem Inkproof.Float.scaleTwoPow_of_neg : ∀ (m : Nat) {e : Int}, e < 0 → Inkproof.Float.scaleTwoPow m e = ↑m / ↑(2 ^ (-e).toNat)
 theorem Inkproof.Float.scaleTwoPow_of_nonneg : ∀ (m : Nat) {e : Int}, 0 ≤ e → Inkproof.Float.scaleTwoPow m e = ↑m * ↑(2 ^ e.toNat)
+theorem Inkproof.Float.scaleTwoPow_one_nat : ∀ (n : Nat), Inkproof.Float.scaleTwoPow 1 ↑n = ↑(2 ^ n)
 theorem Inkproof.Float.scaleTwoPow_one_pos : ∀ (n : Nat), 0 < Inkproof.Float.scaleTwoPow 1 ↑n
 theorem Inkproof.Float.scaleTwoPow_zero : ∀ (e : Int), Inkproof.Float.scaleTwoPow 0 e = 0
 def Inkproof.Float.unpackedValue : Float.Model.UnpackedFloat → Option Rat

@@ -182,6 +182,47 @@ theorem FloatFormat.Approx.ulps {f : FloatFormat} {z : Option Rat} {r k : Rat} (
   have := Rat.mul_le_mul_of_nonneg_left h2 (Rat.mul_nonneg ha hi)
   grind
 
+/-- The absolute form of `Approx`: the value is within `|r| * 2 ^ -prec` of `r`. -/
+theorem FloatFormat.Approx.abs_le {f : FloatFormat} {z : Option Rat} {r : Rat} (h : f.Approx z r) :
+    ∃ q, z = some q ∧ (q - r).abs ≤ r.abs * (scaleTwoPow 1 f.prec)⁻¹ := by
+  obtain ⟨q, hq, hb⟩ := h
+  refine ⟨q, hq, ?_⟩
+  rw [Rat.div_def] at hb
+  grind
+
+theorem scaleTwoPow_one_nat (n : Nat) : scaleTwoPow 1 n = ((2 ^ n : Nat) : Rat) := by
+  rw [scaleTwoPow_of_nonneg 1 (Int.natCast_nonneg n)]
+  simp
+
+theorem FloatFormat.rounding_unit_pos (f : FloatFormat) : 0 < (scaleTwoPow 1 f.prec)⁻¹ :=
+  Rat.inv_pos.mpr (scaleTwoPow_one_pos f.prec)
+
+/-- `2 ^ -prec` is at most `1 / 8` once `3 ≤ prec`. -/
+theorem FloatFormat.rounding_unit_le_eighth (f : FloatFormat) (h : 3 ≤ f.prec) :
+    (scaleTwoPow 1 f.prec)⁻¹ ≤ 1 / 8 := by
+  have h8 : (8 : Nat) ≤ 2 ^ f.prec := by
+    calc 8 = 2 ^ 3 := rfl
+      _ ≤ 2 ^ f.prec := Nat.pow_le_pow_right (by omega) h
+  have h8' : (8 : Rat) ≤ ((2 ^ f.prec : Nat) : Rat) := by exact_mod_cast h8
+  rw [scaleTwoPow_one_nat, Rat.div_def, Rat.one_mul]
+  have hN : ((2 ^ f.prec : Nat) : Rat) * ((2 ^ f.prec : Nat) : Rat)⁻¹ = 1 :=
+    Rat.mul_inv_cancel _ (by grind)
+  have hi := Rat.le_of_lt (Rat.inv_pos.mpr (show (0 : Rat) < ((2 ^ f.prec : Nat) : Rat) by grind))
+  have := Rat.mul_le_mul_of_nonneg_right h8' hi
+  grind
+
+/-- `2 ^ k * 2 ^ -prec = 2 ^ -(prec - k)` for `k ≤ prec`. -/
+theorem FloatFormat.pow_mul_rounding_unit (f : FloatFormat) {k : Nat} (h : k ≤ f.prec) :
+    ((2 ^ k : Nat) : Rat) * (scaleTwoPow 1 f.prec)⁻¹ = (scaleTwoPow 1 (f.prec - k : Nat))⁻¹ := by
+  have hp : 2 ^ f.prec = 2 ^ k * 2 ^ (f.prec - k) := by rw [← Nat.pow_add]; congr 1; omega
+  have hk : ((2 ^ k : Nat) : Rat) ≠ 0 := by exact_mod_cast (Nat.pos_iff_ne_zero.mp (Nat.two_pow_pos k))
+  have hr : ((2 ^ (f.prec - k) : Nat) : Rat) ≠ 0 := by exact_mod_cast (Nat.pos_iff_ne_zero.mp (Nat.two_pow_pos _))
+  rw [scaleTwoPow_one_nat, scaleTwoPow_one_nat, hp]
+  push_cast at hk hr ⊢
+  generalize ((2 : Rat) ^ k) = A at *
+  generalize ((2 : Rat) ^ (f.prec - k)) = B at *
+  grind
+
 namespace Float
 
 theorem Approximates.rel {z : Float} {r : Rat} (h : Float.Approximates z r) :

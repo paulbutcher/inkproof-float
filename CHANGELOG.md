@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.4.0
+
+- Public lemmas over any `FloatFormat` for the absolute form of `Approx` and for `2 ^ -prec` (its bound and its product with `2 ^ k`).
+
 ## v0.3.0
 
 - The order and integer literals of `Float` and `Float32` are proved from Lean's model, so `float_rounding_model` and `float32_rounding_model` now assume only the rounding error bounds.
