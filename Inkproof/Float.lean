@@ -9,3 +9,4 @@ import Inkproof.Float.Exact
 import Inkproof.Float.Axioms
 import Inkproof.Float.OrdFloat
 import Inkproof.Float.RelError
+import Inkproof.Float.RatLemmas
