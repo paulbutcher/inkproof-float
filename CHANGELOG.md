@@ -1,9 +1,12 @@
 # Changelog
 
+## v0.5.0
+
+- Public `clamp` and `Rat` lemmas on squares, magnitude and clamping.
+
 ## v0.4.0
 
 - Public lemmas over any `FloatFormat` for the absolute form of `Approx` and for `2 ^ -prec` (its bound and its product with `2 ^ k`).
-- Public `clamp` and `Rat` lemmas on squares, magnitude and clamping.
 
 ## v0.3.0
 
