@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.5.2
+
+- The README lists what the library does.
+
 ## v0.5.1
 
 - The tests run under Lasm 0.8.0.
