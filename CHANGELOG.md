@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.5.1
+
+- The tests run under Lasm 0.8.0.
+
 ## v0.5.0
 
 - Public `clamp` and `Rat` lemmas on squares, magnitude and clamping.
