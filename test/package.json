@@ -1,0 +1,11 @@
+{
+  "name": "inkproof-float-test",
+  "private": true,
+  "description": "Runs the Inkproof.Float tests compiled with Lasm; development only.",
+  "devDependencies": {
+    "@lasm/cli": "0.8.0"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  }
+}
