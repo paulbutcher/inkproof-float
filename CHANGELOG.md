@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.6.0
+
+- `Float.near` compares two floats within a relative tolerance, with theorems that a NaN is never near anything.
+
 ## v0.5.2
 
 - The README lists what the library does.

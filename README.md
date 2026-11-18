@@ -21,6 +21,7 @@ then `import Inkproof.Float`.
 - Propagate relative error through arithmetic over `Rat`: `rel_error_step`, `rel_error_mul`, `rel_error_div`, `rel_error_round`, and `rat_abs_add_le`, `rat_abs_mul`, `rat_abs_le_iff`.
 - Total order on floats: `OrdFloat` (floats that are not NaN), built with `OrdFloat.ofFloat?`, with `≤` a decidable linear order (`instIsLinearOrder`, `float_le_linear`), so floats can be sorted and compared.
 - Exact scaling by powers of two over `Rat`: `scaleTwoPow` and its `_of_nonneg`, `_of_neg`, `_one_nat`, `_one_pos`, `_zero` lemmas.
+- Compare two floats within a relative tolerance: `Float.near a b tol` (default `1e-6`; false if either is NaN or infinite), with `Float.near_iff`, `Float.near_isFinite`, `Float.near_nan_left`, `Float.near_nan_right`.
 - The bit pattern of negative zero: `negZeroBits`.
 
 Part of Inkproof. Released under the Apache 2.0 license; see `LICENSE`.

@@ -9,6 +9,11 @@ theorem Inkproof.Float.Float.approximates_fma : ∀ {x y z : Float} {a b c : Rat
 theorem Inkproof.Float.Float.approximates_mul : ∀ {x y : Float} {a b : Rat}, Inkproof.Float.Float.toRat x = Option.some a → Inkproof.Float.Float.toRat y = Option.some b → Inkproof.Float.NormalRange (a * b) → Inkproof.Float.Float.Approximates (x * y) (a * b)
 theorem Inkproof.Float.Float.approximates_sub : ∀ {x y : Float} {a b : Rat}, Inkproof.Float.Float.toRat x = Option.some a → Inkproof.Float.Float.toRat y = Option.some b → Inkproof.Float.NormalRange (a - b) → Inkproof.Float.Float.Approximates (x - y) (a - b)
 theorem Inkproof.Float.Float.le_of_toRat_le : ∀ {x y : Float} {a b : Rat}, Inkproof.Float.Float.toRat x = Option.some a → Inkproof.Float.Float.toRat y = Option.some b → a ≤ b → x ≤ y
+def Inkproof.Float.Float.near : Float → Float → optParam Float 1e-6 → Bool
+theorem Inkproof.Float.Float.near_iff : ∀ {a b tol : Float}, Inkproof.Float.Float.near a b tol = Bool.true ↔ a.isFinite = Bool.true ∧ b.isFinite = Bool.true ∧ (a - b).abs ≤ tol * (1 + a.abs + b.abs)
+theorem Inkproof.Float.Float.near_isFinite : ∀ {a b tol : Float}, Inkproof.Float.Float.near a b tol = Bool.true → a.isFinite = Bool.true ∧ b.isFinite = Bool.true
+theorem Inkproof.Float.Float.near_nan_left : ∀ {a : Float}, a.isNaN = Bool.true → ∀ (b tol : Float), Inkproof.Float.Float.near a b tol = Bool.false
+theorem Inkproof.Float.Float.near_nan_right : ∀ (a : Float) {b : Float}, b.isNaN = Bool.true → ∀ (tol : Float), Inkproof.Float.Float.near a b tol = Bool.false
 def Inkproof.Float.Float.toRat : Float → Option Rat
 theorem Inkproof.Float.Float.toRat_eq_value : ∀ (x : Float), Inkproof.Float.Float.toRat x = Inkproof.Float.unpackedValue x.toModel.unpack
 theorem Inkproof.Float.Float.toRat_mono : ∀ {x y : Float} {a b : Rat}, Inkproof.Float.Float.toRat x = Option.some a → Inkproof.Float.Float.toRat y = Option.some b → x ≤ y → a ≤ b
