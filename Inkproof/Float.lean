@@ -11,3 +11,4 @@ import Inkproof.Float.OrdFloat
 import Inkproof.Float.RelError
 import Inkproof.Float.RatLemmas
 import Inkproof.Float.Near
+import Inkproof.Float.OfRat

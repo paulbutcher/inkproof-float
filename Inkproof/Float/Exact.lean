@@ -59,6 +59,39 @@ theorem Float.toRat_ofNat {n : Nat} (h : n < 2 ^ 53) :
   rw [hf, Float.toRat_eq_value, hM]
   exact ofNat_value Format.binary64 hlt
 
+open Internal.FloatModel in
+private theorem unpack_exp_lt (b : BitVec 64) :
+    (match UnpackedFloat.unpack Format.binary64 b with
+      | .finite _ _ e _ => e < 972
+      | _ => True) := by
+  refine unpack_cases b (fun u => match u with | .finite _ _ e _ => e < 972 | _ => True)
+    ?_ ?_ ?_ ?_ ?_ <;> intros <;> simp only
+  · omega
+  · have := Nat.mod_lt (b.toNat / 2 ^ 52) (show 0 < 2 ^ 11 by decide)
+    omega
+
+theorem Float.toRat_neg (x : Float) : Float.toRat (-x) = (Float.toRat x).map (-·) := by
+  have hc : CanonFor (-1074) 53 x.toModel.unpack := unpack_canon x.toBits.toBitVec
+  have hx : (match x.toModel.unpack with | .finite _ _ e _ => e < 972 | _ => True) :=
+    unpack_exp_lt x.toBits.toBitVec
+  have hneg : (-x).toModel.unpack =
+      UnpackedFloat.unpack Format.binary64
+        (UnpackedFloat.pack Format.binary64 x.toModel.unpack.neg) := rfl
+  rw [Float.toRat_eq_value, Float.toRat_eq_value, hneg]
+  generalize x.toModel.unpack = u at hc hx ⊢
+  cases u with
+  | notANumber => decide +kernel
+  | infinity s => clear hc; cases s <;> decide +kernel
+  | zero s =>
+    simp only [UnpackedFloat.neg, unpack_pack_zero, unpackedValue, Option.map_some]
+    cases s <;> simp
+  | finite s m e hm =>
+    simp only [CanonFor] at hc
+    have hx' : e < 972 := hx
+    simp only [UnpackedFloat.neg]
+    rw [unpack_pack_finite Format.binary64 (-s) hm hc (by simp [Format.exponentBias]; omega)]
+    cases s <;> simp [unpackedValue]
+
 theorem Float32.toRat_mono {x y : Float32} {a b : Rat} (hx : Float32.toRat x = some a)
     (hy : Float32.toRat y = some b) (h : x ≤ y) : a ≤ b :=
   (Float32.le_iff_toRat hx hy).mp h

@@ -23,6 +23,7 @@ then `import Inkproof.Float`.
 - Exact scaling by powers of two over `Rat`: `scaleTwoPow` and its `_of_nonneg`, `_of_neg`, `_one_nat`, `_one_pos`, `_zero` lemmas.
 - Compare two floats within a relative tolerance: `Float.near a b tol` (default `1e-6`; false if either is NaN or infinite), with `Float.near_iff`, `Float.near_isFinite`, `Float.near_nan_left`, `Float.near_nan_right`.
 - Clamp a value into a range: `Float.clamp lo hi x` (any type with a decidable `<`), with `rat_clamp_eq_max_min`, `rat_clamp_mem` (the result lies in `[lo, hi]`) and `rat_clamp_sq_le` (it is the nearest point of the range).
+- Convert a rational to the nearest `Float`: `Rat.toFloat`, with `Rat.approximates_toFloat` (within half an ulp when numerator and denominator are below 2^53), and `Float.toRat_neg` (negation is exact).
 - The bit pattern of negative zero: `negZeroBits`.
 
 Part of Inkproof. Released under the Apache 2.0 license; see `LICENSE`.

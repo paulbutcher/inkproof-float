@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.7.0
+
+- `Rat.toFloat` converts a rational to a float, with a theorem that it is within half an ulp when the numerator and denominator are below 2^53.
+- `Float.toRat_neg` shows negation of a float is exact.
+
 ## v0.6.1
 
 - The README lists `Float.clamp`.

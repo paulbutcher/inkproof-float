@@ -17,6 +17,7 @@ theorem Inkproof.Float.Float.near_nan_right : ∀ (a : Float) {b : Float}, b.isN
 def Inkproof.Float.Float.toRat : Float → Option Rat
 theorem Inkproof.Float.Float.toRat_eq_value : ∀ (x : Float), Inkproof.Float.Float.toRat x = Inkproof.Float.unpackedValue x.toModel.unpack
 theorem Inkproof.Float.Float.toRat_mono : ∀ {x y : Float} {a b : Rat}, Inkproof.Float.Float.toRat x = Option.some a → Inkproof.Float.Float.toRat y = Option.some b → x ≤ y → a ≤ b
+theorem Inkproof.Float.Float.toRat_neg : ∀ (x : Float), Inkproof.Float.Float.toRat (-x) = Option.map (fun x => -x) (Inkproof.Float.Float.toRat x)
 theorem Inkproof.Float.Float.toRat_ofNat : ∀ {n : Nat}, n < 2 ^ 53 → Inkproof.Float.Float.toRat (OfNat.ofNat n) = Option.some ↑n
 def Inkproof.Float.Float32.Approximates : Float32 → Rat → Prop
 theorem Inkproof.Float.Float32.Approximates.error_step : ∀ {z : Float32} {r s e : Rat}, Inkproof.Float.Float32.Approximates z r → (r - s).abs ≤ e → ∃ q, Inkproof.Float.Float32.toRat z = Option.some q ∧ (q - s).abs ≤ e + (s.abs + e) / Inkproof.Float.scaleTwoPow 1 24
@@ -91,3 +92,5 @@ theorem Inkproof.Float.scaleTwoPow_one_nat : ∀ (n : Nat), Inkproof.Float.scale
 theorem Inkproof.Float.scaleTwoPow_one_pos : ∀ (n : Nat), 0 < Inkproof.Float.scaleTwoPow 1 ↑n
 theorem Inkproof.Float.scaleTwoPow_zero : ∀ (e : Int), Inkproof.Float.scaleTwoPow 0 e = 0
 def Inkproof.Float.unpackedValue : Float.Model.UnpackedFloat → Option Rat
+theorem Rat.approximates_toFloat : ∀ {r : Rat}, r.num.natAbs < 2 ^ 53 → r.den < 2 ^ 53 → Inkproof.Float.NormalRange r → Inkproof.Float.Float.Approximates r.toFloat r
+def Rat.toFloat : Rat → Float

@@ -173,8 +173,21 @@ def literalsExact : TestCase := .mk "integer literals are exact" <|
   forAll 2000 (fun g => g.below (2 ^ 53)) fun n =>
     check (Float.toRat (Float.ofNat n) == some (n : Rat)) s!"{n}"
 
+def genRat (g : Rng) : Rat × Rng :=
+  let (n, g) := g.below (2 ^ 54)
+  let (d, g) := g.below (2 ^ 53 - 1)
+  (mkRat ((n : Int) - 2 ^ 53) (d + 1), g)
+
+def ratToFloatRounds : TestCase := .mk "Rat.toFloat is within half an ulp of the rational" <|
+  forAll 5000 genRat fun r =>
+    if decide (NormalRange r) then
+      match Float.toRat (Rat.toFloat r) with
+      | none => check false s!"{r} gives a float that is not finite"
+      | some q => check ((q - r).abs ≤ r.abs / scaleTwoPow 1 53) s!"{r} is off"
+    else pure ()
+
 def tests : List TestCase :=
-  [ofFloatRejectsOnlyNaN, orderHolds, toRatValues, roundingModelHolds, fmaRounds, literalsExact,
+  [ratToFloatRounds, ofFloatRejectsOnlyNaN, orderHolds, toRatValues, roundingModelHolds, fmaRounds, literalsExact,
     roundingModel32Holds, literals32Exact]
 
 /-! The rounding-constant lemmas instantiate at both formats; the scale of binary64 and binary32 is
