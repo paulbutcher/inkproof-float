@@ -67,14 +67,12 @@ theorem rel_error_div (t4 t3 v A B C u c4 k c : Rat) (hk1 : k < 1)
     (h4 : (t4 - A * B).abs ≤ (A * B).abs * c4) (h3 : (t3 - C).abs ≤ C.abs * k)
     (hv : v * t3 = t4) (hc : c4 + k ≤ c * (1 - k)) :
     (v - u).abs ≤ u.abs * c := by
-  have hCpos : 0 < C.abs := by
-    unfold Rat.abs; split <;> grind
+  have hCpos : 0 < C.abs := Rat.abs_pos_iff.mpr hC
   have e : (v - u) * t3 = (t4 - A * B) + u * (C - t3) := by grind
   have lhs : ((v - u) * t3).abs = (v - u).abs * t3.abs := rat_abs_mul _ _
   have t := rat_abs_add_le (t4 - A * B) (u * (C - t3))
   have hAB : (A * B).abs = u.abs * C.abs := by rw [← hu, rat_abs_mul]
-  have hCt : (C - t3).abs = (t3 - C).abs := by
-    unfold Rat.abs; split <;> split <;> grind
+  have hCt : (C - t3).abs = (t3 - C).abs := Rat.abs_sub_comm
   have m1 : (u * (C - t3)).abs ≤ u.abs * (C.abs * k) := by
     rw [rat_abs_mul, hCt]
     exact Rat.mul_le_mul_of_nonneg_left h3 (Rat.abs_nonneg)

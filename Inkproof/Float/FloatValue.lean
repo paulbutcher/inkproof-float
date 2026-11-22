@@ -7,21 +7,22 @@ namespace Inkproof.Float
 
 /-- `m * 2 ^ e` as a rational. -/
 def scaleTwoPow (m : Nat) (e : Int) : Rat :=
-  if 0 ≤ e then ((m * 2 ^ e.toNat : Nat) : Rat) else (m : Rat) / ((2 ^ (-e).toNat : Nat) : Rat)
+  (m : Rat) * 2 ^ e
 
 theorem scaleTwoPow_of_nonneg (m : Nat) {e : Int} (h : 0 ≤ e) :
     scaleTwoPow m e = (m : Rat) * ((2 ^ e.toNat : Nat) : Rat) := by
-  simp [scaleTwoPow, h]
+  obtain ⟨n, rfl⟩ := Int.eq_ofNat_of_zero_le h
+  simp [scaleTwoPow, Rat.zpow_natCast]
 
 theorem scaleTwoPow_of_neg (m : Nat) {e : Int} (h : e < 0) :
     scaleTwoPow m e = (m : Rat) / ((2 ^ (-e).toNat : Nat) : Rat) := by
-  simp [scaleTwoPow, Int.not_le.mpr h]
+  obtain ⟨n, hn⟩ := Int.eq_ofNat_of_zero_le (Int.neg_nonneg_of_nonpos (Int.le_of_lt h))
+  have : e = -(n : Int) := by omega
+  subst this
+  simp [scaleTwoPow, Rat.zpow_neg, Rat.zpow_natCast, Rat.div_def]
 
 theorem scaleTwoPow_zero (e : Int) : scaleTwoPow 0 e = 0 := by
-  unfold scaleTwoPow
-  split
-  · simp
-  · rw [Rat.div_def]; simp
+  simp [scaleTwoPow]
 
 theorem scaleTwoPow_one_pos (n : Nat) : (0 : Rat) < scaleTwoPow 1 n := by
   rw [scaleTwoPow_of_nonneg 1 (Int.natCast_nonneg n)]
@@ -132,10 +133,13 @@ theorem FloatFormat.Approx.rel {f : FloatFormat} {z : Option Rat} {r : Rat} (h :
   by_cases hr : r = 0
   · subst hr
     have h0 : (q - 0).abs ≤ 0 := by simpa [Rat.div_def] using hb
-    have hq0 : q = 0 := by unfold Rat.abs at h0; grind
+    have hq0 : q = 0 := by
+      have h1 : q.abs ≤ 0 := by
+        have : q - 0 = q := by grind
+        rwa [this] at h0
+      exact Rat.abs_eq_zero_iff.mp (Rat.le_antisymm h1 Rat.abs_nonneg)
     refine ⟨q, 0, hq, ?_, by rw [hq0]; simp⟩
-    have : (0 : Rat).abs = 0 := Rat.abs_of_nonneg (Rat.le_refl)
-    rw [this]
+    rw [Rat.abs_zero]
     simpa [Rat.div_def] using Rat.le_of_lt (Rat.inv_pos.mpr hu)
   · have hrr : r * r⁻¹ = 1 := Rat.mul_inv_cancel _ hr
     have hpos : 0 < r.abs := Rat.abs_pos_iff.mpr hr

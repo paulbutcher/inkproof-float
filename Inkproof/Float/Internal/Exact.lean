@@ -12,36 +12,15 @@ namespace Inkproof.Float.Internal.Exact
 open Float.Model Float.Model.UnpackedFloat
 
 theorem scaleTwoPow_eq_mul (m : Nat) (e : Int) : scaleTwoPow m e = (m : Rat) * scaleTwoPow 1 e := by
-  unfold scaleTwoPow
-  split
-  · simp
-  · simp [Rat.div_def]
+  simp [scaleTwoPow]
 
 theorem scaleTwoPow_succ (e : Int) : scaleTwoPow 1 (e + 1) = 2 * scaleTwoPow 1 e := by
-  unfold scaleTwoPow
-  by_cases h : 0 ≤ e
-  · have h1 : 0 ≤ e + 1 := by omega
-    have : (e + 1).toNat = e.toNat + 1 := by omega
-    simp [h, h1, this, Nat.pow_succ]
-    grind
-  · by_cases h2 : 0 ≤ e + 1
-    · have : e = -1 := by omega
-      subst this
-      simp [Rat.div_def]
-      grind
-    · have h3 : (-(e+1)).toNat + 1 = (-e).toNat := by omega
-      simp only [h, h2, ite_false, Rat.div_def]
-      rw [← h3]
-      simp only [Nat.pow_succ]
-      push_cast
-      grind
+  have h : (2 : Rat) ≠ 0 := by decide
+  simp only [scaleTwoPow, Rat.zpow_add_one h]
+  grind
 
 theorem scaleTwoPow_pos (e : Int) : 0 < scaleTwoPow 1 e := by
-  unfold scaleTwoPow
-  split
-  · have : (0 : Nat) < 2 ^ e.toNat := Nat.two_pow_pos _
-    simp; exact_mod_cast this
-  · simp [Rat.div_def]; exact Rat.inv_pos.mpr (by exact_mod_cast Nat.two_pow_pos _)
+  simpa [scaleTwoPow] using Rat.zpow_pos (n := e) (a := 2) (by decide)
 
 theorem scaleTwoPow_add_nat (e : Int) (k : Nat) :
     scaleTwoPow 1 (e + k) = (2 ^ k : Nat) * scaleTwoPow 1 e := by

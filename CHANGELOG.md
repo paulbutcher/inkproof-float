@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.7.1
+
+- `scaleTwoPow` is defined with Lean core's `Rat` integer power and its lemmas derive from core's `Rat.zpow` lemmas; no public declaration is removed or its statement changed.
+- Proofs use core's `Rat.abs_pos_iff`, `Rat.abs_sub_comm` and `Rat.abs_zero` instead of unfolding `Rat.abs`.
+
 ## v0.7.0
 
 - `Rat.toFloat` converts a rational to a float, with a theorem that it is within half an ulp when the numerator and denominator are below 2^53.
