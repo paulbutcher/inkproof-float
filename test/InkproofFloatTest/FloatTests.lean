@@ -186,8 +186,13 @@ def ratToFloatRounds : TestCase := .mk "Rat.toFloat is within half an ulp of the
       | some q => check ((q - r).abs ≤ r.abs / scaleTwoPow 1 53) s!"{r} is off"
     else pure ()
 
+def onRatMapsNonFinite : TestCase := .mk "Float.onRat maps NaN and infinity to 0 and finite results through" do
+  check (Float.onRat (fun x => x / 0.0) 1 == 0) "infinity"
+  check (Float.onRat (fun x => x / 0.0 - x / 0.0) 1 == 0) "NaN"
+  check (Float.onRat (fun x => x * 2.0) (3 / 4) == 3 / 2) "finite"
+
 def tests : List TestCase :=
-  [ratToFloatRounds, ofFloatRejectsOnlyNaN, orderHolds, toRatValues, roundingModelHolds, fmaRounds, literalsExact,
+  [onRatMapsNonFinite, ratToFloatRounds, ofFloatRejectsOnlyNaN, orderHolds, toRatValues, roundingModelHolds, fmaRounds, literalsExact,
     roundingModel32Holds, literals32Exact]
 
 /-! The rounding-constant lemmas instantiate at both formats; the scale of binary64 and binary32 is

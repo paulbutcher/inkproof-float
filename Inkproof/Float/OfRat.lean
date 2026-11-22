@@ -56,4 +56,22 @@ theorem _root_.Rat.approximates_toFloat {r : Rat} (hn : r.num.natAbs < 2 ^ 53)
     simp only [hneg, ite_false]
     exact h
 
+/-- `f` run on a rational: convert with `Rat.toFloat`, apply `f`, read the result back exactly. A
+NaN or infinite result becomes `0`. -/
+def Float.onRat (f : Float → Float) (r : Rat) : Rat :=
+  (Float.toRat (f (Rat.toFloat r))).getD 0
+
+theorem Float.onRat_eq (f : Float → Float) (r : Rat) :
+    Float.onRat f r = (Float.toRat (f (Rat.toFloat r))).getD 0 := rfl
+
+/-- A non-finite result of `f` is mapped to `0`. -/
+theorem Float.onRat_of_toRat_eq_none {f : Float → Float} {r : Rat}
+    (h : Float.toRat (f (Rat.toFloat r)) = none) : Float.onRat f r = 0 := by
+  simp [Float.onRat, h]
+
+/-- A finite result of `f` is read back exactly. -/
+theorem Float.onRat_of_toRat_eq_some {f : Float → Float} {r q : Rat}
+    (h : Float.toRat (f (Rat.toFloat r)) = some q) : Float.onRat f r = q := by
+  simp [Float.onRat, h]
+
 end Inkproof.Float

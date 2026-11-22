@@ -14,6 +14,10 @@ theorem Inkproof.Float.Float.near_iff : ∀ {a b tol : Float}, Inkproof.Float.Fl
 theorem Inkproof.Float.Float.near_isFinite : ∀ {a b tol : Float}, Inkproof.Float.Float.near a b tol = Bool.true → a.isFinite = Bool.true ∧ b.isFinite = Bool.true
 theorem Inkproof.Float.Float.near_nan_left : ∀ {a : Float}, a.isNaN = Bool.true → ∀ (b tol : Float), Inkproof.Float.Float.near a b tol = Bool.false
 theorem Inkproof.Float.Float.near_nan_right : ∀ (a : Float) {b : Float}, b.isNaN = Bool.true → ∀ (tol : Float), Inkproof.Float.Float.near a b tol = Bool.false
+def Inkproof.Float.Float.onRat : (Float → Float) → Rat → Rat
+theorem Inkproof.Float.Float.onRat_eq : ∀ (f : Float → Float) (r : Rat), Inkproof.Float.Float.onRat f r = (Inkproof.Float.Float.toRat (f r.toFloat)).getD 0
+theorem Inkproof.Float.Float.onRat_of_toRat_eq_none : ∀ {f : Float → Float} {r : Rat}, Inkproof.Float.Float.toRat (f r.toFloat) = Option.none → Inkproof.Float.Float.onRat f r = 0
+theorem Inkproof.Float.Float.onRat_of_toRat_eq_some : ∀ {f : Float → Float} {r q : Rat}, Inkproof.Float.Float.toRat (f r.toFloat) = Option.some q → Inkproof.Float.Float.onRat f r = q
 def Inkproof.Float.Float.toRat : Float → Option Rat
 theorem Inkproof.Float.Float.toRat_eq_value : ∀ (x : Float), Inkproof.Float.Float.toRat x = Inkproof.Float.unpackedValue x.toModel.unpack
 theorem Inkproof.Float.Float.toRat_mono : ∀ {x y : Float} {a b : Rat}, Inkproof.Float.Float.toRat x = Option.some a → Inkproof.Float.Float.toRat y = Option.some b → x ≤ y → a ≤ b

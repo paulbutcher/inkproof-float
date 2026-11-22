@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.8.0
+
+- `Float.onRat` runs a float function on a rational, mapping a non-finite result to 0, with theorems for its value.
+
 ## v0.7.1
 
 - `scaleTwoPow` is defined with Lean core's `Rat` integer power and its lemmas derive from core's `Rat.zpow` lemmas; no public declaration is removed or its statement changed.
