@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.8.1
+
+- The README names no release version in its `require` example.
+
 ## v0.8.0
 
 - `Float.onRat` runs a float function on a rational, mapping a non-finite result to 0, with theorems for its value.
