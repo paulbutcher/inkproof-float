@@ -2,10 +2,10 @@
 
 The floating-point model of Inkproof: the exact value of a `Float`, the rounding axioms and the error bounds they give, and floats that are linearly ordered. It depends on nothing and knows nothing of series, scales or charts. See `DESIGN.md`.
 
-Require it at the current release:
+Require it at the latest release tag (see `CHANGELOG.md`; `lakefile.lean` records the pins this repository builds against), replacing `vX.Y.Z`:
 
 ```lean
-require «inkproof-float» from git "https://github.com/paulbutcher/inkproof-float" @ "v0.5.1"
+require «inkproof-float» from git "https://github.com/paulbutcher/inkproof-float" @ "vX.Y.Z"
 ```
 
 then `import Inkproof.Float`.
